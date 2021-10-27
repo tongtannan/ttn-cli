@@ -1,9 +1,10 @@
 const fs = require('fs')
-const consoleColors = require('../utils')
-const npm = require('./install')
+const ora = require('ora')
 const exec = require('child_process').exec
-let LocalStorage = require('node-localstorage').LocalStorage,
-  localStorage = new LocalStorage('./scratch')
+
+const { consoleColors, filterTemplate } = require('../utils')
+const npm = require('./install')
+const { savePreset, loadOptions } = require('../utils/options')
 
 let questionRes = null
 let originSourcePath = null
@@ -11,6 +12,7 @@ let fileCount = 0 /* 文件数量 */
 let dirCount = 0 /* 文件夹数量 */
 let flat = 0 /* readir数量 */
 let isInstall = false
+let spinner = null
 
 const PACKAGE_MANAGER_SHELL = {
   npm: {
@@ -22,28 +24,26 @@ const PACKAGE_MANAGER_SHELL = {
     start: 'yarn dev'
   }
 }
-const DEFAULT_CONFIG = {
-  name: 'demoName',
-  author: 'demoAuthor',
-  packageManager: 'npm'
-}
+const STORAGE_NAME = 'template'
 
 module.exports = function (res) {
   consoleColors.green('------开始构建-------')
-  // 是否使用缓存
-  console.log(localStorage.getItem('ttn-cli'))
+  // 是否新建项目
   if (res.conf) {
-    localStorage.setItem('ttn-cli', JSON.stringify(res))
+    // 保存为模板
+    res.template && savePreset(STORAGE_NAME, res)
     questionRes = res
   } else {
-    questionRes = JSON.parse(localStorage.getItem('ttn-cli')) || DEFAULT_CONFIG
+    console.log('loadOptions', loadOptions())
+    // 使用模板
+    questionRes = loadOptions().presets[STORAGE_NAME]
   }
   const sourcePath = __dirname.slice(0, -3) + 'template'
   originSourcePath = sourcePath
 
   const currentPath = `${process.cwd()}/${questionRes.name}`
-
-  // consoleColors.green('当前路径:' + process.cwd())
+  spinner = ora('正在下载项目模板')
+  spinner.start()
   fs.mkdir(currentPath, () => {
     consoleColors.yellow('创建文件夹：' + currentPath)
     copy(sourcePath, currentPath, npm())
@@ -109,14 +109,18 @@ function completeControl(cb) {
         resolveRegister('.yarnrc')
       ])
         .then(() => {
-          consoleColors.green('------构建完成-------')
-          consoleColors.cyan('-----开始install，请稍等...-----')
+          spinner.succeed()
+          consoleColors.green('------项目模板下载完成-------')
+          spinner = ora('开始install，请稍等')
+          spinner.start()
+          // consoleColors.cyan('-----开始install，请稍等...-----')
 
           const cmdStr = `cd ${questionRes.name} && ${
-            PACKAGE_MANAGER_SHELL[questionRes.packageManager]['install']
+            PACKAGE_MANAGER_SHELL[questionRes.package]['install']
           }`
           exec(cmdStr, (err, sudout) => {
             if (!err) {
+              spinner.succeed()
               consoleColors.green('-----完成install-----')
               runProject()
             }
@@ -136,7 +140,7 @@ function completeControl(cb) {
 function runProject() {
   try {
     const cmdStr = `cd ${questionRes.name} && ${
-      PACKAGE_MANAGER_SHELL[questionRes.packageManager]['start']
+      PACKAGE_MANAGER_SHELL[questionRes.package]['start']
     }`
     consoleColors.cyan('-----正在启动-----')
     exec(cmdStr, (err, sudout) => {
@@ -154,11 +158,14 @@ function resolvePackage() {
     fs.readFile(originSourcePath + '/package.json', (err, data) => {
       if (err) throw err
       const { author, name } = questionRes
-      let json = data.toString()
-      json = json.replace(/demoName/g, name.trim())
-      json = json.replace(/demoAuthor/g, author.trim())
+      const template = filterTemplate(data, {
+        demoName: name.trim(),
+        demoAuthor: author.trim(),
+        demoDevDependencies: '"moment": "^2.25.3"'
+      })
       const path = `${process.cwd()}/${name}/package.json`
-      fs.writeFile(path, new Buffer(json), () => {
+
+      fs.writeFile(path, new Buffer(template), () => {
         consoleColors.green('创建文件：' + path)
         resolve()
       })
@@ -177,9 +184,10 @@ function resolveRegister(fileName) {
     } else {
       fs.readFile(originSourcePath + `/${fileName}`, (err, data) => {
         if (err) throw err
-        let json = data.toString()
-        json = json.replace(/denoRegister/g, register.trim())
-        fs.writeFile(path, new Buffer(json), () => {
+        const template = filterTemplate(data, {
+          denoRegister: register.trim()
+        })
+        fs.writeFile(path, new Buffer(template), () => {
           resolve()
         })
       })

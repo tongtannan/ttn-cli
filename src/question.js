@@ -17,7 +17,7 @@ const create = [
   {
     type: 'list',
     message: '请选择包管理器？',
-    name: 'packageManager',
+    name: 'package',
     choices: ['npm', 'yarn'],
     filter: function (val) {
       return val.toLowerCase()
@@ -26,7 +26,14 @@ const create = [
   },
   {
     name: 'register',
-    message: '请输入代理地址，不需要代理回车？'
+    message: '请输入代理地址，不需要代理回车？',
+    when: (res) => Boolean(res.conf)
+  },
+  {
+    name: 'template',
+    type: 'confirm',
+    message: '是否保存为模板？',
+    when: (res) => Boolean(res.conf)
   }
 ]
 
