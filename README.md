@@ -8,13 +8,13 @@
 
 ### 创建项目
 
-`cli create`
+`mvc create`
 
 ### 开发环境执行 `npm link`
 
-此时就可以使用 `cli` 命令了。
+此时就可以使用 `mvc` 命令了。
 
-- `cli create`
+- `mvc create`
 
 ### 发布
 
