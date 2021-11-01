@@ -16,6 +16,16 @@ const create = [
   },
   {
     type: 'list',
+    message: '请选择状态管理？',
+    name: 'state',
+    choices: ['redux', 'mobx', 'none'],
+    filter: function (val) {
+      return val.toLowerCase()
+    },
+    when: (res) => Boolean(res.conf)
+  },
+  {
+    type: 'list',
     message: '请选择包管理器？',
     name: 'package',
     choices: ['npm', 'yarn'],

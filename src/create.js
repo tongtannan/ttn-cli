@@ -24,6 +24,11 @@ const PACKAGE_MANAGER_SHELL = {
     start: 'yarn dev'
   }
 }
+const STATE_MANAGEMENT = {
+  redux: '"redux": "^4.1.2"',
+  mobx: '"mbox": "^6.3.5"',
+  none: ''
+}
 const STORAGE_NAME = 'template'
 
 module.exports = function (res) {
@@ -50,7 +55,7 @@ module.exports = function (res) {
   })
 }
 
-function copy(sourcePath, currentPath, cb) {
+function copy(sourcePath, currentPath) {
   flat++
   fs.readdir(sourcePath, (err, paths) => {
     flat--
@@ -71,11 +76,11 @@ function copy(sourcePath, currentPath, cb) {
           readSteam.pipe(writeSteam)
           consoleColors.green('创建文件：' + newCurrentPath)
           fileCount--
-          completeControl(cb, sourcePath)
+          completeControl()
         } else if (stat.isDirectory()) {
           if (path !== '.git') {
             dirCount++
-            dirExist(newSoucePath, newCurrentPath, copy, cb)
+            dirExist(newSoucePath, newCurrentPath, copy)
           }
         }
       })
@@ -83,25 +88,25 @@ function copy(sourcePath, currentPath, cb) {
   })
 }
 
-function dirExist(sourcePath, currentPath, copyCallback, cb) {
+function dirExist(sourcePath, currentPath, copyCallback) {
   fs.stat(sourcePath, (ext) => {
     if (ext) {
-      copyCallback(sourcePath, currentPath, cb)
+      copyCallback(sourcePath, currentPath)
     } else {
       fs.mkdir(currentPath, () => {
         fileCount--
         dirCount--
-        copyCallback(sourcePath, currentPath, cb)
+        copyCallback(sourcePath, currentPath)
         consoleColors.yellow('创建文件夹：' + currentPath)
-        completeControl(cb)
+        completeControl()
       })
     }
   })
 }
 
-function completeControl(cb) {
+function completeControl() {
   if (fileCount === 0 && dirCount === 0 && flat === 0) {
-    if (cb && !isInstall) {
+    if (!isInstall) {
       isInstall = true
       Promise.all([
         resolvePackage(),
@@ -113,22 +118,18 @@ function completeControl(cb) {
           consoleColors.green('------项目模板下载完成-------')
           spinner = ora('开始install，请稍等')
           spinner.start()
-          // consoleColors.cyan('-----开始install，请稍等...-----')
 
           const cmdStr = `cd ${questionRes.name} && ${
             PACKAGE_MANAGER_SHELL[questionRes.package]['install']
           }`
           exec(cmdStr, (err, sudout) => {
+            console.log(err, sudout)
             if (!err) {
               spinner.succeed()
               consoleColors.green('-----完成install-----')
               runProject()
             }
           })
-          // cb(() => {
-          //   consoleColors.cyan('-----完成install-----')
-          //   runProject()
-          // })
         })
         .catch((err) => {
           console.log(err)
@@ -146,8 +147,6 @@ function runProject() {
     exec(cmdStr, (err, sudout) => {
       consoleColors.green('-----启动成功-----')
     })
-    // const run = npm['run dev']
-    // run()
   } catch (error) {
     consoleColors.red('自动启动失败，请手动yarn dev 启动项目')
   }
@@ -157,11 +156,11 @@ function resolvePackage() {
   return new Promise((resolve) => {
     fs.readFile(originSourcePath + '/package.json', (err, data) => {
       if (err) throw err
-      const { author, name } = questionRes
+      const { author, name, state } = questionRes
       const template = filterTemplate(data, {
         demoName: name.trim(),
         demoAuthor: author.trim(),
-        demoDevDependencies: '"moment": "^2.25.3"'
+        demoDevDependencies: STATE_MANAGEMENT[state]
       })
       const path = `${process.cwd()}/${name}/package.json`
 
