@@ -5,6 +5,16 @@ const create = [
     message: '是否创建新的项目？'
   },
   {
+    type: 'list',
+    message: '请选择项目类型？',
+    name: 'type',
+    choices: ['react', 'koa2'],
+    filter: function (val) {
+      return val.toLowerCase()
+    },
+    when: (res) => Boolean(res.conf)
+  },
+  {
     name: 'name',
     message: '请输入项目名称？',
     when: (res) => Boolean(res.conf)
@@ -22,13 +32,13 @@ const create = [
     filter: function (val) {
       return val.toLowerCase()
     },
-    when: (res) => Boolean(res.conf)
+    when: (res) => Boolean(res.conf) && res.type === 'react'
   },
   {
     type: 'list',
     message: '请选择包管理器？',
     name: 'package',
-    choices: ['npm', 'yarn'],
+    choices: ['npm', 'yarn', 'pnpm'],
     filter: function (val) {
       return val.toLowerCase()
     },
@@ -36,7 +46,7 @@ const create = [
   },
   {
     name: 'register',
-    message: '请输入代理地址，不需要代理回车？',
+    message: '请输入代理地址，不需要代理回车',
     when: (res) => Boolean(res.conf)
   },
   {

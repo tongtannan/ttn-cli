@@ -22,6 +22,10 @@ const PACKAGE_MANAGER_SHELL = {
   yarn: {
     install: 'yarn',
     start: 'yarn dev'
+  },
+  pnpm: {
+    install: 'pnpm install',
+    start: 'pnpm dev'
   }
 }
 const STATE_MANAGEMENT = {
@@ -43,7 +47,7 @@ module.exports = function (res) {
     // 使用模板
     questionRes = loadOptions().presets[STORAGE_NAME]
   }
-  const sourcePath = __dirname.slice(0, -3) + 'template'
+  const sourcePath = __dirname.slice(0, -3) + 'template/' + questionRes.type
   originSourcePath = sourcePath
 
   const currentPath = `${process.cwd()}/${questionRes.name}`
@@ -119,16 +123,18 @@ function completeControl() {
           spinner = ora('开始install，请稍等')
           spinner.start()
 
-          const cmdStr = `cd ${questionRes.name} && ${
-            PACKAGE_MANAGER_SHELL[questionRes.package]['install']
-          }`
-          exec(cmdStr, (err, sudout) => {
-            console.log(err, sudout)
-            if (!err) {
-              spinner.succeed()
-              consoleColors.green('-----完成install-----')
-              runProject()
-            }
+          setImmediate(() => {
+            const cmdStr = `cd ${questionRes.name} && ${
+              PACKAGE_MANAGER_SHELL[questionRes.package]['install']
+            }`
+            exec(cmdStr, (err, sudout) => {
+              console.log(err, sudout)
+              if (!err) {
+                spinner.succeed()
+                consoleColors.green('-----完成install-----')
+                runProject()
+              }
+            })
           })
         })
         .catch((err) => {
@@ -143,7 +149,7 @@ function runProject() {
     const cmdStr = `cd ${questionRes.name} && ${
       PACKAGE_MANAGER_SHELL[questionRes.package]['start']
     }`
-    consoleColors.cyan('-----正在启动-----')
+    consoleColors.cyan(`-----正在启动，cd ${questionRes.name}-----`)
     exec(cmdStr, (err, sudout) => {
       consoleColors.green('-----启动成功-----')
     })
@@ -156,12 +162,21 @@ function resolvePackage() {
   return new Promise((resolve) => {
     fs.readFile(originSourcePath + '/package.json', (err, data) => {
       if (err) throw err
-      const { author, name, state } = questionRes
-      const template = filterTemplate(data, {
+      const { author, name, state, type } = questionRes
+      const templateObj = {
         demoName: name.trim(),
-        demoAuthor: author.trim(),
-        demoDevDependencies: STATE_MANAGEMENT[state]
-      })
+        demoAuthor: author.trim()
+      }
+      switch (type) {
+        case 'react':
+          templateObj.demoDevDependencies = STATE_MANAGEMENT[state]
+          templateObj.demoSymbol = STATE_MANAGEMENT[state] ? ',' : ''
+          break
+
+        default:
+          break
+      }
+      const template = filterTemplate(data, templateObj)
       const path = `${process.cwd()}/${name}/package.json`
 
       fs.writeFile(path, new Buffer(template), () => {
