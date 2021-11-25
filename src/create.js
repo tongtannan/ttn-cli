@@ -47,7 +47,7 @@ module.exports = function (res) {
     // 使用模板
     questionRes = loadOptions().presets[STORAGE_NAME]
   }
-  const sourcePath = __dirname.slice(0, -3) + 'template/' + questionRes.type
+  const sourcePath = __dirname.slice(0, -3) + 'templates/' + questionRes.type
   originSourcePath = sourcePath
 
   const currentPath = `${process.cwd()}/${questionRes.name}`

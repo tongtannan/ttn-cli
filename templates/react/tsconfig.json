@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "jsx": "react",
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "lib": ["es6", "DOM"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "**/*.tsx",
+    "**/*.ts",
+    "./typings/**/*.ts"
+  ],
+}

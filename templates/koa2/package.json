@@ -1,0 +1,61 @@
+{
+  "name": "{{demoName}}",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "repository": "gitlab@git.garena.com:kang.yuan/booknode.git",
+  "author": "{{demoAuthor}}",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-convert": "^1.2.0",
+    "koa-generic-session": "^2.2.0",
+    "koa-json": "^2.0.2",
+    "koa-logger": "^3.2.0",
+    "koa-morgan": "^1.0.1",
+    "koa-onerror": "^4.1.0",
+    "koa-redis": "^4.0.1",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0",
+    "koa-views": "^6.2.0",
+    "koa2-cors": "^2.0.6",
+    "mongoose": "^5.11.17",
+    "pug": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.4",
+    "@types/node": "^14.14.28",
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.20.0",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.5.4",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.2.1",
+    "ts-node": "^9.1.1",
+    "tsconfig-paths": "^3.12.0",
+    "typescript": "^4.1.5"
+  },
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development ./node_modules/.bin/nodemon src/bin/www",
+    "prd": "cross-env NODE_ENV=production pm2 start pm2.conf.json",
+    "test": "cross-env NODE_ENV=production pm2 start --interpreter ./node_modules/.bin/ts-node src/bing/www.ts",
+    "build": "cross-env NODE_ENV=production npx tsc --project ./",
+    "lint": "eslint src/**/*.ts",
+    "format": "eslint src/**/*.ts --fix",
+    "write": "prettier --write src/**/*.ts"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "yarn lint"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
+}
