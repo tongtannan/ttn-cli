@@ -1,3 +1,4 @@
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = {
   withDev(config) {
@@ -17,6 +18,8 @@ module.exports = {
       hmr: true,
       publicPath: '/',
     };
+
+    config.plugins.push(new ReactRefreshWebpackPlugin());
 
     config.devServer = {
       contentBase: path.join(__dirname, '..', 'dist', 'qcadmin', 'static'),

@@ -125,6 +125,9 @@ const config = {
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         use: 'babel-loader',
+        options: {
+          plugins: [isDev && require.resolve('react-refresh/babel')].filter(Boolean),
+        },
       },
       {
         test: /\.(png|jpg|jpeg|gif|eot|woff|svg|ttf)$/i,
