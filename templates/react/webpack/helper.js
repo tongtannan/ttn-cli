@@ -1,4 +1,5 @@
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const env = process.env.ENV || 'test';
+const locale = process.env.LOCALE || 'ID';
 
 module.exports = {
   withDev(config) {
@@ -15,29 +16,37 @@ module.exports = {
 
     config.module.rules[0].use[0].options = {
       ...config.module.rules[0].use[0].options,
-      hmr: true,
       publicPath: '/',
     };
 
-    config.plugins.push(new ReactRefreshWebpackPlugin());
+    config.infrastructureLogging = {
+      colors: true,
+      level: 'verbose',
+    };
 
     config.devServer = {
-      contentBase: path.join(__dirname, '..', 'dist', 'qcadmin', 'static'),
+      static: {
+        directory: path.join(__dirname, '..', 'dist', 'qcadmin', 'static'),
+        publicPath: '/',
+        serveIndex: true,
+        watch: true,
+      },
+      client: {
+        logging: 'error',
+      },
       open: true,
-      disableHostCheck: true,
+      allowedHosts: 'all',
       historyApiFallback: true,
       hot: true,
+      port: 8888,
       proxy: {
         '/api': {
-          target: ``,
-          logLevel: 'debug',
+          target: `https://cqcp.test.com`,
           changeOrigin: true,
         },
       },
     };
 
-    config.devtool = 'inline-source-map';
-
-    config.watch = true;
+    config.devtool = 'eval-cheap-module-source-map';
   },
 };

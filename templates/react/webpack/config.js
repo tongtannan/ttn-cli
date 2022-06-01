@@ -4,11 +4,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+
+const smp = new SpeedMeasurePlugin();
 
 const { withDev } = require('./helper');
 
 const env = process.env.NODE_ENV || 'development';
 const isDev = env === 'development';
+const isTestBuild = process.env.SMP;
 
 const config = {
   mode: 'production',
@@ -17,13 +21,20 @@ const config = {
     publicPath: '/static/',
     filename: '[name]-[chunkhash].js',
     chunkFilename: '[name]-[chunkhash].js',
+    pathinfo: false,
   },
   target: 'web',
+  cache: true,
+  optimization: {
+    runtimeChunk: true,
+    concatenateModules: false,
+  },
   resolve: {
     extensions: ['*', '.ts', '.tsx', '.js', '.json'],
     alias: {
       '@': path.resolve(__dirname, '../src'),
     },
+    symlinks: false,
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -48,10 +59,6 @@ const config = {
         minifyURLs: true,
       },
     }),
-    new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css',
-      chunkFilename: '[name].[contenthash].css',
-    }),
 
     new MomentLocalesPlugin({
       localesToKeep: ['es-us'],
@@ -69,7 +76,6 @@ const config = {
             loader: MiniCssExtractPlugin.loader,
             options: {
               publicPath: '/static/',
-              reloadAll: true,
             },
           },
           { loader: 'css-loader' },
@@ -116,6 +122,35 @@ const config = {
             loader: 'less-loader',
             options: {
               javascriptEnabled: true,
+              modifyVars: {
+                'primary-color': '#2673dd',
+              },
+            },
+          },
+        ],
+      },
+
+      {
+        test: /\.scss$/,
+        use: [
+          require.resolve('style-loader'),
+          {
+            loader: require.resolve('@teamsupercell/typings-for-css-modules-loader'),
+          },
+          {
+            loader: require.resolve('css-loader'),
+            options: {
+              sourceMap: isDev,
+              modules: {
+                mode: 'local',
+                localIdentName: '[name]_[local]_[hash:base64:5]',
+              },
+            },
+          },
+          {
+            loader: require.resolve('sass-loader'),
+            options: {
+              sourceMap: isDev,
             },
           },
         ],
@@ -124,11 +159,16 @@ const config = {
       {
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
-        use: 'babel-loader',
-        options: {
-          plugins: [isDev && require.resolve('react-refresh/babel')].filter(Boolean),
-        },
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
+        ],
       },
+
       {
         test: /\.(png|jpg|jpeg|gif|eot|woff|svg|ttf)$/i,
         use: [
@@ -148,4 +188,11 @@ if (isDev) {
   withDev(config);
 }
 
-module.exports = config;
+const configWithTimeMeasures = isTestBuild ? smp.wrap(config) : config;
+configWithTimeMeasures.plugins.push(
+  new MiniCssExtractPlugin({
+    filename: '[name].[contenthash].css',
+    chunkFilename: '[name].[contenthash].css',
+  }),
+);
+module.exports = configWithTimeMeasures;

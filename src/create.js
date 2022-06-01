@@ -17,15 +17,15 @@ let spinner = null
 const PACKAGE_MANAGER_SHELL = {
   npm: {
     install: 'npm install',
-    start: 'npm run dev'
+    start: 'npm run dev-vite'
   },
   yarn: {
     install: 'yarn',
-    start: 'yarn dev'
+    start: 'yarn dev-vite'
   },
   pnpm: {
     install: 'pnpm install',
-    start: 'pnpm dev'
+    start: 'pnpm dev-vite'
   }
 }
 const STATE_MANAGEMENT = {
@@ -145,17 +145,20 @@ function completeControl() {
 }
 
 function runProject() {
-  try {
-    const cmdStr = `cd ${questionRes.name} && ${
-      PACKAGE_MANAGER_SHELL[questionRes.package]['start']
-    }`
-    consoleColors.cyan(`-----正在启动，cd ${questionRes.name}-----`)
-    exec(cmdStr, (err, sudout) => {
-      consoleColors.green('-----启动成功-----')
-    })
-  } catch (error) {
-    consoleColors.red('自动启动失败，请手动yarn dev 启动项目')
-  }
+  // try {
+  //   const cmdStr = `cd ${questionRes.name} && ${
+  //     PACKAGE_MANAGER_SHELL[questionRes.package]['start']
+  //   }`
+  //   consoleColors.cyan(`-----正在启动，cd ${questionRes.name}-----`)
+  //   exec(cmdStr, (err, sudout) => {
+  //     consoleColors.green('-----启动成功-----')
+  //   })
+  // } catch (error) {
+  //   consoleColors.red('自动启动失败，请手动yarn dev 启动项目')
+  // }
+  consoleColors.cyan(`👉  Get started with the following commands:`)
+  consoleColors.green(`cd ${questionRes.name}`)
+  consoleColors.green(`${PACKAGE_MANAGER_SHELL[questionRes.package]['start']}`)
 }
 
 function resolvePackage() {

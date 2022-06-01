@@ -6,18 +6,13 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
+    "isolatedModules": true,
     "lib": ["es6", "DOM"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "**/*.tsx",
-    "**/*.ts",
-    "./typings/**/*.ts"
-  ],
+  "exclude": ["node_modules"],
+  "include": ["**/*.tsx", "**/*.ts", "./typings/**/*.ts"]
 }
