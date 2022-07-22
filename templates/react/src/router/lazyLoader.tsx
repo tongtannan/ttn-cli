@@ -1,28 +1,16 @@
 import React from 'react';
-import Loadable from 'react-loadable';
-import LoadableComponent from '@loadable/component';
-import { Button } from 'antd';
+import loadable from '@loadable/component';
 
-import { Loading } from '@/components';
+import ErrorBoundary from './ErrorBoundary';
 
-const isDev = process.env.NODE_ENV === 'development';
-
-const createContainer = (loader): React.ReactNode => {
-  if (isDev) return LoadableComponent(loader);
-
-  return Loadable({
-    loading: (props): React.ReactNode => {
-      if (props.error) {
-        return (
-          <div>
-            Error! <Button onClick={props.retry}>Retry</Button>
-          </div>
-        );
-      }
-      return <Loading />;
-    },
-    loader,
+export default (loader: any): React.ReactNode => {
+  const Component = loadable(loader, {
+    fallback: <div>Loading...</div>,
   });
-}
 
-export default createContainer;
+  return (
+    <ErrorBoundary>
+      <Component />
+    </ErrorBoundary>
+  );
+};

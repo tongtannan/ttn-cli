@@ -1,6 +1,6 @@
 {
   "name": "ttn-cli",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -22,7 +22,7 @@
   "dependencies": {
     "@babel/core": "^7.15.8",
     "babel-loader": "^8.2.3",
-    "chalk": "^4.1.2",
+    "chalk": "4.1.2",
     "commander": "^8.3.0",
     "fs-extra": "^10.0.0",
     "handlebars": "^4.7.7",

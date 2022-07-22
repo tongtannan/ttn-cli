@@ -1,51 +1,70 @@
-import React from 'react';
-import { SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  ContainerOutlined,
+  DesktopOutlined,
+  MailOutlined,
+  PieChartOutlined,
+} from '@ant-design/icons';
 
-import createContainer from './lazyLoader';
-/**
- * Router configuration supports a tree structure to configure routing. The first two nodes of the routing tree will be rendered to the navigation bar. You can add the innerRouter attribute to avoid rendering.
- * Each layer of routing needs to configure the attributes
- * key（required）
- * text（display text，required）
- * path（
- *  Single layer routing（don't allow /asd/asdads，only /asd），required。
- *  If you need to use /user/test as the path, please use an object package containing path, key, and children (if text is not provided, it will not be rendered in breadcrumbs)
- *  The path will be assembled downward from the root node.
- *  Support the routing parameter /:id of react-router.
- *  It should be noted that if a node path is a routing parameter, the node cannot have sibling nodes, but can have child nodes, pay attention to configure the exact attribute by yourself
- * ）
- * component（Rendering component. If this property is not configured, the link rendered by clicking on the node will not be adjusted, and the breadcrumb will appear as unclickable text）
- * exact（react-router exact）
- * icon（antd icon, only the first layer will be rendered）
- * children（Build a tree structure）
- * innerRouter（Avoid rendering in navigate）
- */
-export interface RouterConfig {
-  key: string;
-  text: string;
-  path: string;
-  exact?: boolean;
-  crumbText?: string;
-  innerRouter?: any;
-  icon?: React.ReactNode;
-  component?: React.ReactNode;
-  children?: RouterConfig[];
-}
-const Home = createContainer(() => import('../pages/Home'));
+import LazyLoader from './LazyLoader';
+import { RoutePath, ComponentMap, RouterFlatten, Route } from './type.d';
 
-const Sharding = createContainer(() => import('../pages/Sharding'));
+const Home = LazyLoader(() => import('../pages/Home/index'));
+const Second2 = LazyLoader(() => import('../pages/First/Second2/index'));
+const Third1 = LazyLoader(() => import('../pages/First/Second1/Third1/index'));
 
-export const HomeTab = {
-  text: 'Product Management',
-  icon: SettingOutlined,
-  path: '/',
-  exact: true,
-  component: Home,
+const componentMap: ComponentMap = {
+  [RoutePath.HOME]: Home,
+  [RoutePath.SECOND_SECOND]: Second2,
+  [RoutePath.THIRD_ONE]: Third1,
 };
 
-export const ShardingTab = {
-  text: 'Sharding',
-  icon: ShareAltOutlined,
-  path: '/sharding',
-  component: Sharding,
+const routers: Route[] = [
+  {
+    label: 'Home',
+    icon: AppstoreOutlined,
+    path: RoutePath.HOME,
+  },
+  {
+    label: 'First',
+    icon: ContainerOutlined,
+    path: RoutePath.FIRST,
+    children: [
+      {
+        label: 'Second1',
+        icon: DesktopOutlined,
+        path: RoutePath.SECOND_ONE,
+        children: [
+          {
+            label: 'Third1',
+            icon: PieChartOutlined,
+            path: RoutePath.THIRD_ONE,
+          },
+        ],
+      },
+      {
+        label: 'Second2',
+        icon: MailOutlined,
+        path: RoutePath.SECOND_SECOND,
+      },
+    ],
+  },
+];
+
+const routerFlatten: RouterFlatten[] = [];
+const flattenFn = (routers: Route[], parentPath: string, keys: Array<string>) => {
+  routers.forEach((r) => {
+    const path = `${parentPath}${r.path}`;
+    keys.push(path);
+    routerFlatten.push({
+      path,
+      keys,
+      component: componentMap[r.path],
+    });
+    r.children?.length && flattenFn(r.children, path, keys.slice());
+    keys.pop();
+  });
 };
+flattenFn(routers, '', []);
+
+export { routers, routerFlatten };

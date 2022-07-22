@@ -1,9 +1,8 @@
 import React, { memo, useEffect } from 'react';
 import { Button } from 'antd';
 
-import demo from '@/assets/demo.png';
-
 import { get } from '@/api/test';
+import requestCancel from '@/utils/requestCancel';
 
 export default memo(() => {
   useEffect(() => {
@@ -11,8 +10,9 @@ export default memo(() => {
   }, []);
 
   const handleClick = () => {
+    requestCancel.cancelRepeatRequest();
     get({
-      biz_id: 1,
+      biz_id: 2,
       date: 20220721,
     }).then((res) => {
       console.log(res);
@@ -21,8 +21,7 @@ export default memo(() => {
 
   return (
     <div>
-      {/* <img src={demo} alt="demo" /> */}
-
+      second
       <Button onClick={handleClick}>api</Button>
     </div>
   );

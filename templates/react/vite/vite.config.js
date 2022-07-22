@@ -4,9 +4,6 @@ import react from '@vitejs/plugin-react';
 import vitePluginImp from 'vite-plugin-imp';
 import loadCssModulePlugin from 'vite-plugin-for-load-css-module';
 
-var env = process.env.ENV || 'test';
-var locale = process.env.LOCALE || 'ID';
-
 var path = require('path');
 
 // https://vitejs.dev/config/
@@ -31,12 +28,13 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8888,
+    port: 8200,
     strictPort: false,
     open: true,
     proxy: {
       '/api': {
-        target: `https://test.com`,
+        // target: `http://cqcp-qa.i.sz.shopee.io`,
+        target: `https://cqcp.test.shopee.sg`,
         changeOrigin: true,
       },
     },
@@ -44,8 +42,7 @@ export default defineConfig({
   plugins: [
     react(),
     loadCssModulePlugin({
-      include: (id) =>
-        (id.endsWith('less') && !id.includes('node_modules')) || (id.endsWith('scss') && id.includes('node_modules')),
+      include: (id) => id.endsWith('less') && !id.includes('node_modules'),
     }),
     vitePluginImp({
       libList: [
@@ -56,4 +53,9 @@ export default defineConfig({
       ],
     }),
   ],
+  define: {
+    // By default, Vite doesn't include shims for NodeJS/
+    // necessary for segment analytics lib to work
+    global: {},
+  },
 });

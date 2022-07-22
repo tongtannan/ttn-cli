@@ -17,20 +17,20 @@ let spinner = null
 const PACKAGE_MANAGER_SHELL = {
   npm: {
     install: 'npm install',
-    start: 'npm run dev-vite'
+    start: 'npm run dev'
   },
   yarn: {
-    install: 'yarn',
-    start: 'yarn dev-vite'
+    install: 'yarn install',
+    start: 'yarn dev'
   },
   pnpm: {
     install: 'pnpm install',
-    start: 'pnpm dev-vite'
+    start: 'pnpm dev'
   }
 }
 const STATE_MANAGEMENT = {
-  redux: '"redux": "^4.1.2"',
-  mobx: '"mbox": "^6.3.5"',
+  redux: '"redux": "^4.2.0"',
+  recoil: '"recoil": "^0.7.4"',
   none: ''
 }
 const STORAGE_NAME = 'template'
@@ -157,7 +157,7 @@ function runProject() {
   //   consoleColors.red('自动启动失败，请手动yarn dev 启动项目')
   // }
   consoleColors.cyan(`👉  Get started with the following commands:`)
-  consoleColors.green(`cd ${questionRes.name}`)
+  consoleColors.green(`cd ${questionRes.name}`, 'and then')
   consoleColors.green(`${PACKAGE_MANAGER_SHELL[questionRes.package]['start']}`)
 }
 
@@ -205,6 +205,7 @@ function resolveRegister(fileName) {
           denoRegister: register.trim()
         })
         fs.writeFile(path, new Buffer(template), () => {
+          consoleColors.green('创建文件：' + path)
           resolve()
         })
       })

@@ -11,7 +11,6 @@ module.exports = {
         useBuiltIns: 'entry',
         corejs: {
           version: '3',
-          // prposals: true,
         },
         loose: true,
       },
@@ -31,17 +30,5 @@ module.exports = {
       },
     ],
   ],
-  env: {
-    test: {
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            modules: 'auto',
-          },
-          'jest',
-        ],
-      ],
-    },
-  },
+  env: {},
 };

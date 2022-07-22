@@ -28,7 +28,7 @@ const create = [
     type: 'list',
     message: '请选择状态管理？',
     name: 'state',
-    choices: ['redux', 'mobx', 'none'],
+    choices: ['redux', 'recoil', 'none'],
     filter: function (val) {
       return val.toLowerCase()
     },
