@@ -17,6 +17,7 @@
   "author": "{{demoAuthor}}",
   "license": "MIT",
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
     "@loadable/component": "^5.15.2",
     "antd": "^4.21.6",
     "axios": "^0.27.2",
