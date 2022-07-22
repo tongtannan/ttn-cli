@@ -15,7 +15,9 @@ commander
   .command('create')
   .description('create project')
   .action(function () {
-    green(`😎 😎 😎 欢迎使用cli ${version},轻松构建react项目～ 🎉🎉🎉 `)
+    green(
+      `😎 😎 😎 欢迎使用ttn-cli ${version},轻松构建react/koa2项目～ 🎉🎉🎉 `
+    )
     inquirer().then((res) => {
       create(res)
     })

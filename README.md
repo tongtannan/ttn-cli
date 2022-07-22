@@ -1,14 +1,18 @@
-# ttn-cli
+## ttn-cli
 
 一款搭建 react/koa2 项目的脚手架
 
-### 安装依赖
+### 安装
 
-`npm install`
+`npm install ttn-cli -g`
 
 ### 创建项目
 
 `mvc create`
+
+### 安装依赖
+
+`npm install`
 
 ### 开发环境执行 `npm link`
 

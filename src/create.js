@@ -35,6 +35,8 @@ const STATE_MANAGEMENT = {
 }
 const STORAGE_NAME = 'template'
 
+const specFile = ['npmrc', 'yarnrc', 'gitignore']
+
 module.exports = function (res) {
   consoleColors.green('------开始构建-------')
   // 是否新建项目
@@ -75,10 +77,13 @@ function copy(sourcePath, currentPath) {
           throw err
         }
         if (stat.isFile()) {
-          const readSteam = fs.createReadStream(newSoucePath)
-          const writeSteam = fs.createWriteStream(newCurrentPath)
-          readSteam.pipe(writeSteam)
-          consoleColors.green('创建文件：' + newCurrentPath)
+          // 特殊文件publish失败，单独处理
+          if (!specFile.includes(path)) {
+            const readSteam = fs.createReadStream(newSoucePath)
+            const writeSteam = fs.createWriteStream(newCurrentPath)
+            readSteam.pipe(writeSteam)
+            consoleColors.green('创建文件：' + newCurrentPath)
+          }
           fileCount--
           completeControl()
         } else if (stat.isDirectory()) {
@@ -114,10 +119,12 @@ function completeControl() {
       isInstall = true
       Promise.all([
         resolvePackage(),
-        resolveRegister('.npmrc'),
-        resolveRegister('.yarnrc')
+        resolveRegister('npmrc'),
+        resolveRegister('yarnrc'),
+        copySpecFile('gitignore')
       ])
         .then(() => {
+          // return
           spinner.succeed()
           consoleColors.green('------项目模板下载完成-------')
           spinner = ora('开始install，请稍等')
@@ -193,22 +200,33 @@ function resolvePackage() {
 function resolveRegister(fileName) {
   return new Promise((resolve) => {
     const { register, name } = questionRes
-    const path = `${process.cwd()}/${name}/${fileName}`
-    if (!register) {
-      fs.writeFile(path, new Buffer(''), () => {
+    const path = `${process.cwd()}/${name}/.${fileName}`
+
+    fs.readFile(originSourcePath + `/${fileName}`, (err, data) => {
+      if (err) throw err
+      const template = filterTemplate(data, {
+        denoRegister: !register ? '' : register.trim()
+      })
+      fs.writeFile(path, new Buffer(template), () => {
+        consoleColors.green('创建文件：' + path)
         resolve()
       })
-    } else {
-      fs.readFile(originSourcePath + `/${fileName}`, (err, data) => {
-        if (err) throw err
-        const template = filterTemplate(data, {
-          denoRegister: register.trim()
-        })
-        fs.writeFile(path, new Buffer(template), () => {
-          consoleColors.green('创建文件：' + path)
-          resolve()
-        })
+    })
+  })
+}
+
+function copySpecFile(fileName) {
+  return new Promise((resolve) => {
+    const { name } = questionRes
+    const path = `${process.cwd()}/${name}/.${fileName}`
+
+    fs.readFile(originSourcePath + `/${fileName}`, (err, data) => {
+      if (err) throw err
+      const template = filterTemplate(data, {})
+      fs.writeFile(path, new Buffer(template), () => {
+        consoleColors.green('创建文件：' + path)
+        resolve()
       })
-    }
+    })
   })
 }

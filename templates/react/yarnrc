@@ -1,2 +1,2 @@
-registry "denoRegister"
+registry "{{denoRegister}}"
 unsafe-disable-integrity-migration true
