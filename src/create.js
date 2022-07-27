@@ -8,6 +8,7 @@ const { savePreset, loadOptions } = require('../utils/options')
 
 let questionRes = null
 let originSourcePath = null
+let commonSourcePath = null
 let fileCount = 0 /* 文件数量 */
 let dirCount = 0 /* 文件夹数量 */
 let flat = 0 /* readir数量 */
@@ -33,7 +34,9 @@ const STATE_MANAGEMENT = {
   recoil: '"recoil": "^0.7.4"',
   none: ''
 }
-const STORAGE_NAME = 'template'
+const STORAGE_NAME = 'template_cli'
+
+const DEFAULT_NAME = 'cli'
 
 const specFile = ['npmrc', 'yarnrc', 'gitignore']
 
@@ -41,16 +44,23 @@ module.exports = function (res) {
   consoleColors.green('------开始构建-------')
   // 是否新建项目
   if (res.conf) {
-    // 保存为模板
-    res.template && savePreset(STORAGE_NAME, res)
     questionRes = res
+    if (!questionRes.name) questionRes.name = DEFAULT_NAME
+    // 保存为模板
+    res.template && savePreset(STORAGE_NAME, questionRes)
   } else {
-    console.log('loadOptions', loadOptions())
+    // console.log('loadOptions', loadOptions())
     // 使用模板
-    questionRes = loadOptions().presets[STORAGE_NAME]
+    questionRes = loadOptions().presets[STORAGE_NAME] || {
+      type: 'react',
+      name: DEFAULT_NAME,
+      list: 'none',
+    }
   }
-  const sourcePath = __dirname.slice(0, -3) + 'templates/' + questionRes.type
+  const templateSourcePath = __dirname.slice(0, -3) + 'templates/'
+  const sourcePath = `${templateSourcePath}${questionRes.type}`
   originSourcePath = sourcePath
+  commonSourcePath = `${templateSourcePath}common`
 
   const currentPath = `${process.cwd()}/${questionRes.name}`
   spinner = ora('正在下载项目模板')
@@ -117,12 +127,11 @@ function completeControl() {
   if (fileCount === 0 && dirCount === 0 && flat === 0) {
     if (!isInstall) {
       isInstall = true
-      Promise.all([
-        resolvePackage(),
-        resolveRegister('npmrc'),
-        resolveRegister('yarnrc'),
-        copySpecFile('gitignore')
-      ])
+      const list = [resolvePackage(), copySpecFile('gitignore')]
+      if (questionRes.register) {
+        list.push(resolveRegister('npmrc'), resolveRegister('yarnrc'))
+      }
+      Promise.all(list)
         .then(() => {
           // return
           spinner.succeed()
@@ -161,7 +170,7 @@ function runProject() {
   //     consoleColors.green('-----启动成功-----')
   //   })
   // } catch (error) {
-  //   consoleColors.red('自动启动失败，请手动yarn dev 启动项目')
+  //   consoleColors.red('自动启动失败，请手动启动项目')
   // }
   consoleColors.cyan(`👉  Get started with the following commands:`)
   consoleColors.green(`cd ${questionRes.name}`, 'and then')
@@ -179,7 +188,7 @@ function resolvePackage() {
       }
       switch (type) {
         case 'react':
-          templateObj.demoDevDependencies = STATE_MANAGEMENT[state]
+          templateObj.demoDevDependencies = STATE_MANAGEMENT[state] || ''
           templateObj.demoSymbol = STATE_MANAGEMENT[state] ? ',' : ''
           break
 
@@ -202,7 +211,7 @@ function resolveRegister(fileName) {
     const { register, name } = questionRes
     const path = `${process.cwd()}/${name}/.${fileName}`
 
-    fs.readFile(originSourcePath + `/${fileName}`, (err, data) => {
+    fs.readFile(commonSourcePath + `/${fileName}`, (err, data) => {
       if (err) throw err
       const template = filterTemplate(data, {
         denoRegister: !register ? '' : register.trim()
@@ -220,7 +229,7 @@ function copySpecFile(fileName) {
     const { name } = questionRes
     const path = `${process.cwd()}/${name}/.${fileName}`
 
-    fs.readFile(originSourcePath + `/${fileName}`, (err, data) => {
+    fs.readFile(commonSourcePath + `/${fileName}`, (err, data) => {
       if (err) throw err
       const template = filterTemplate(data, {})
       fs.writeFile(path, new Buffer(template), () => {

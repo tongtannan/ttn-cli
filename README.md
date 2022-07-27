@@ -1,6 +1,6 @@
 ## ttn-cli
 
-一款搭建 react/koa2 项目的脚手架
+一个搭建 react/koa2 项目的脚手架
 
 ### 安装
 
@@ -10,15 +10,17 @@
 
 `mvc create`
 
+## 开发环境
+
 ### 安装依赖
 
 `npm install`
 
-### 开发环境执行 `npm link`
+### 执行 `npm link`
 
 此时就可以使用 `mvc` 命令了。
 
-- `mvc create`
+`mvc create`
 
 ### 发布
 

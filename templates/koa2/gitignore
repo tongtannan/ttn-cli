@@ -1,6 +1,0 @@
-node_modules/
-dist/
-yarn-error.log
-src/GoogleAuth/auth.json
-mongod-localdev.conf
-*.log

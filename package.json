@@ -1,7 +1,7 @@
 {
   "name": "ttn-cli",
-  "version": "2.0.5",
-  "description": "local service for fronted projects",
+  "version": "2.0.7",
+  "description": "cli for fronted projects",
   "main": "index.js",
   "bin": {
     "mvc": "./bin/mvc.js"
