@@ -54,7 +54,7 @@ module.exports = function (res) {
     questionRes = loadOptions().presets[STORAGE_NAME] || {
       type: 'react',
       name: DEFAULT_NAME,
-      list: 'none',
+      list: 'none'
     }
   }
   const templateSourcePath = __dirname.slice(0, -3) + 'templates/'
@@ -181,9 +181,10 @@ function resolvePackage() {
   return new Promise((resolve) => {
     fs.readFile(originSourcePath + '/package.json', (err, data) => {
       if (err) throw err
-      const { author, name, state, type } = questionRes
+      const { name, description, author, state, type } = questionRes
       const templateObj = {
         demoName: name.trim(),
+        demoDescription: description.trim(),
         demoAuthor: author.trim()
       }
       switch (type) {

@@ -1,6 +1,7 @@
 {
   "name": "{{demoName}}",
   "version": "1.0.0",
+  "description": "{{demoDescription}}",
   "main": "./src/index.ts",
   "repository": "gitlab@git.garena.com:kang.yuan/booknode.git",
   "author": "{{demoAuthor}}",

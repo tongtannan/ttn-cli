@@ -20,6 +20,11 @@ const create = [
     when: (res) => Boolean(res.conf)
   },
   {
+    name: 'description',
+    message: '请输入项目描述？',
+    when: (res) => Boolean(res.conf)
+  },
+  {
     name: 'author',
     message: '请输入作者？',
     when: (res) => Boolean(res.conf)

@@ -1,7 +1,7 @@
 {
   "name": "{{demoName}}",
   "version": "1.0.0",
-  "description": "template for react",
+  "description": "{{demoDescription}}",
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development vite --config vite/vite.config.js",
