@@ -12,11 +12,13 @@ import { RoutePath, ComponentMap, RouterFlatten, Route } from './type.d';
 const Home = LazyLoader(() => import('../pages/Home/index'));
 const Second2 = LazyLoader(() => import('../pages/First/Second2/index'));
 const Third1 = LazyLoader(() => import('../pages/First/Second1/Third1/index'));
+const Third1Detail = LazyLoader(() => import('../pages/First/Second1/Third1/detail'));
 
 const componentMap: ComponentMap = {
   [RoutePath.HOME]: Home,
-  [RoutePath.SECOND_SECOND]: Second2,
-  [RoutePath.THIRD_ONE]: Third1,
+  [RoutePath.SECOND_2]: Second2,
+  [RoutePath.THIRD_1]: Third1,
+  [RoutePath.THIRD_1_DETAIL]: Third1Detail,
 };
 
 const routers: Route[] = [
@@ -28,43 +30,50 @@ const routers: Route[] = [
   {
     label: 'First',
     icon: ContainerOutlined,
-    path: RoutePath.FIRST,
     children: [
       {
         label: 'Second1',
         icon: DesktopOutlined,
-        path: RoutePath.SECOND_ONE,
         children: [
           {
             label: 'Third1',
             icon: PieChartOutlined,
-            path: RoutePath.THIRD_ONE,
+            path: RoutePath.THIRD_1,
+            children: [
+              {
+                path: RoutePath.THIRD_1_DETAIL,
+                hide: true,
+              },
+            ],
           },
         ],
       },
       {
         label: 'Second2',
         icon: MailOutlined,
-        path: RoutePath.SECOND_SECOND,
+        path: RoutePath.SECOND_2,
       },
     ],
   },
 ];
 
 const routerFlatten: RouterFlatten[] = [];
-const flattenFn = (routers: Route[], parentPath: string, keys: Array<string>) => {
+const flattenFn = (routers: Route[], keys: Array<string>, parentPath: string) => {
   routers.forEach((r) => {
-    const path = `${parentPath}${r.path}`;
-    keys.push(path);
-    routerFlatten.push({
-      path,
-      keys,
-      component: componentMap[r.path],
-    });
-    r.children?.length && flattenFn(r.children, path, keys.slice());
+    const { path } = r;
+    !r.hide && keys.push(r.path || '');
+    path &&
+      routerFlatten.push({
+        path,
+        parentPath,
+        keys: path.split('/'),
+        hide: r.hide,
+        component: path ? componentMap[path] : null,
+      });
+    r.children?.length && flattenFn(r.children, keys, path || '');
     keys.pop();
   });
 };
-flattenFn(routers, '', []);
+flattenFn(routers, [], '');
 
 export { routers, routerFlatten };

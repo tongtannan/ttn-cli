@@ -1,6 +1,6 @@
 {
   "name": "ttn-cli",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "cli for fronted projects",
   "main": "index.js",
   "bin": {

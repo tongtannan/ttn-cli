@@ -2,10 +2,9 @@ import { ClassType, Component, ReactNode } from 'react';
 
 export enum RoutePath {
   HOME = '/',
-  FIRST = '/first',
-  SECOND_ONE = '/second1',
-  SECOND_SECOND = '/second2',
-  THIRD_ONE = '/third1',
+  SECOND_2 = '/first/second2',
+  THIRD_1 = '/first/second1/third1',
+  THIRD_1_DETAIL = '/first/second1/third1/detail',
 }
 
 export type ComponentMap = {
@@ -13,15 +12,17 @@ export type ComponentMap = {
 };
 
 export type RouterFlatten = {
-  path: string;
+  path?: string;
+  parentPath: string;
   keys: Array<string>;
+  hide?: boolean;
   component: ReactNode;
 };
 
 export type Route = {
-  path: RoutePath;
+  path?: RoutePath;
   icon?: React.ClassType<any, any, any>;
-  label: string;
+  label?: string;
   hide?: boolean;
   children?: Array<Route>;
 };

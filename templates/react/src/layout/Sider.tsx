@@ -19,17 +19,18 @@ function getItem(label: ReactNode, key: Key, icon?: ReactNode, children?: MenuIt
   } as MenuItem;
 }
 
-const formatRoutes = (routes: Route[] = [], parentPath: string): MenuItem[] => {
+const formatRoutes = (routes: Route[] = []): MenuItem[] => {
+  const isEmpty = !routes?.length;
+  const allHide = routes?.length && routes.every((route) => route.hide);
   // @ts-ignore
-  if (!routes?.length) return null;
+  if (isEmpty || allHide) return null;
 
   return routes.map((route: Route) => {
-    const path = `${parentPath}${route.path}`;
-    const children = formatRoutes(route.children, path);
-    return route.hide ? null : getItem(route.label, path, route.icon?.render(), children);
+    const children = formatRoutes(route.children);
+    return route.hide ? null : getItem(route.label, route.path || '', route.icon?.render(), children);
   });
 };
-const items: MenuItem[] = formatRoutes(routers, '');
+const items: MenuItem[] = formatRoutes(routers);
 
 const App: FC = () => {
   const { push, href } = UseHistory();
@@ -37,10 +38,12 @@ const App: FC = () => {
   const [openKeys, setOpenKeys] = useState<Array<string>>([]);
 
   useEffect(() => {
-    const openKeys = routerFlatten.find((item) => item.path === href.pathname)?.keys || [];
-
-    setSelectedKeys([href.pathname]);
-    setOpenKeys(openKeys);
+    const item = routerFlatten.find((item) => item.path === href.pathname);
+    if (item) {
+      console.log('href', href, item);
+      setSelectedKeys(!item.hide ? [href.pathname] : [item.parentPath]);
+      setOpenKeys(item?.keys || []);
+    }
   }, []);
 
   useEffect(() => {
@@ -48,8 +51,9 @@ const App: FC = () => {
     requestCancel.cancelRequest();
   }, [href.pathname]);
 
-  const handleSelect = ({ key, selectedKeys }: any) => {
-    setSelectedKeys(selectedKeys);
+  const handleClickMenu = ({ key }: any) => {
+    if (key === href.pathname) return;
+    setSelectedKeys([key]);
     push(key);
   };
 
@@ -62,7 +66,7 @@ const App: FC = () => {
         openKeys={openKeys}
         mode="inline"
         items={items}
-        onSelect={handleSelect}
+        onClick={handleClickMenu}
         onOpenChange={handleOpenChange}
       />
     </div>

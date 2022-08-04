@@ -33,8 +33,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        // target: `http://cqcp-qa.i.sz.shopee.io`,
-        target: `https://cqcp.test.shopee.sg`,
+        target: `https://test.com`,
         changeOrigin: true,
       },
     },

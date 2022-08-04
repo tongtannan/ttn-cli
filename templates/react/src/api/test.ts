@@ -7,7 +7,7 @@ export function get(data: RequestParams) {
 }
 
 export function post(data: RequestConfig) {
-  return api.post('v1/qc/start', data);
+  return api.post('v1/qc/tasks', data);
 }
 
 export function formPost(data: RequestConfig) {

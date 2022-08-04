@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "{{demoDescription}}",
   "main": "./src/index.ts",
-  "repository": "gitlab@git.garena.com:kang.yuan/booknode.git",
+  "repository": "",
   "author": "{{demoAuthor}}",
   "license": "UNLICENSED",
   "dependencies": {
