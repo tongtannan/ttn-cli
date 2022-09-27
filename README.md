@@ -1,6 +1,6 @@
 ## ttn-cli
 
-一个搭建 react/koa2 项目的脚手架
+一个搭建 react/koa2/tool 项目的脚手架
 
 ### 安装
 

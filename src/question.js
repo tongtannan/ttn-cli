@@ -8,7 +8,7 @@ const create = [
     type: 'list',
     message: '请选择项目类型？',
     name: 'type',
-    choices: ['react', 'koa2'],
+    choices: ['react', 'koa2', 'tool'],
     filter: function (val) {
       return val.toLowerCase()
     },
