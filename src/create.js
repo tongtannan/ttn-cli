@@ -64,9 +64,9 @@ module.exports = function (res) {
 
   const currentPath = `${process.cwd()}/${questionRes.name}`
   spinner = ora('正在下载项目模板')
-  spinner.start()
+  spinner.start('')
   fs.mkdir(currentPath, () => {
-    consoleColors.yellow('创建文件夹：' + currentPath)
+    consoleColors.yellow(`\n创建文件夹：${currentPath}`)
     copy(sourcePath, currentPath, npm())
   })
 }
@@ -134,10 +134,10 @@ function completeControl() {
       Promise.all(list)
         .then(() => {
           // return
-          spinner.succeed()
-          consoleColors.green('------项目模板下载完成-------')
+          spinner.succeed('项目模板下载完成')
+          // consoleColors.green('------项目模板下载完成-------')
           spinner = ora('开始install，请稍等')
-          spinner.start()
+          spinner.start('')
 
           setImmediate(() => {
             const cmdStr = `cd ${questionRes.name} && ${
@@ -146,8 +146,8 @@ function completeControl() {
             exec(cmdStr, (err, sudout) => {
               console.log(err, sudout)
               if (!err) {
-                spinner.succeed()
-                consoleColors.green('-----完成install-----')
+                spinner.succeed('完成install')
+                // consoleColors.green('-----完成install-----')
                 runProject()
               }
             })
